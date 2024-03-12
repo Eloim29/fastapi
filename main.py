@@ -2,6 +2,7 @@ from typing import Union
 from fastapi import FastAPI, HTTPException
 from config.database import cursor, conexion
 from fastapi.middleware.cors import CORSMiddleware
+from modulos.cotizacion import get_cotizaciones, cotizacion_por_id, add_cotizacion
 
 origins = [
     
@@ -21,115 +22,128 @@ app.add_middleware(
 def read_root():
     return {"Hello": "World"}
 
+@app.get("/cotizaciones")
+def cotizaciones():
+    return get_cotizaciones()
 
-#************************
-# OBTENER TODOS LOS CLIENTE
-#************************
+@app.get("/cotizaciones/{id}")
+def cotizaciones_id():
+    return cotizacion_por_id()
 
-@app.get("/clientes")
-def get_clientes():
-    clientes = cursor.execute("SELECT * FROM clientes")
-    clientes = cursor.fetchall()
+@app.post("/cotizaciones")
+def agregar_cotizacion():
+    return add_cotizacion()
 
-    clientesParseadosAJSON = []
+# #************************
+# # OBTENER TODOS LOS CLIENTE
+# #************************
 
-    for cliente in clientes:
-        clienteJSON = {
-            "id": cliente[0],
-            "nombre": cliente[1],
-            "direccion": cliente[2],
-            "telefono": cliente[3],
-            "nit": cliente[4],
-            "correo": cliente[5]
-        }
-        clientesParseadosAJSON.append(clienteJSON)
+# @app.get("/clientes")
+# def get_clientes():
+#     clientes = cursor.execute("SELECT * FROM clientes")
+#     clientes = cursor.fetchall()
 
-    return clientesParseadosAJSON
+#     clientesParseadosAJSON = []
 
-#************************
-# OBTENER UN CLIENTE POR SU NOMBRE
-#************************
+#     for cliente in clientes:
+#         clienteJSON = {
+#             "id": cliente[0],
+#             "nombre": cliente[1],
+#             "direccion": cliente[2],
+#             "telefono": cliente[3],
+#             "nit": cliente[4],
+#             "correo": cliente[5]
+#         }
+#         clientesParseadosAJSON.append(clienteJSON)
 
-@app.get("/clientes/{nombre}")
-def getUserByName(nombre: str):
-    clientes = cursor.execute(f"SELECT * FROM clientes WHERE clientes = '{nombre}'")
-    clientes = cursor.fetchone()
+#     return clientesParseadosAJSON
 
-    if clientes:
-        clienteJSON = {
-            "id": clientes[0],
-            "nombre": clientes[1],
-            "direccion": clientes[2],
-            "telefono": clientes[3],
-            "nit": clientes[4],
-            "correo": clientes[5]
-        }
-        return clienteJSON
-    else:
-        return {"error": "Cliente no encontrado"}
+# #************************
+# # OBTENER UN CLIENTE POR SU NOMBRE
+# #************************
+
+# @app.get("/clientes/{nombre}")
+# def getUserByName(nombre: str):
+#     clientes = cursor.execute(f"SELECT * FROM clientes WHERE nombre = '{nombre}'")
+#     clientes = cursor.fetchone()
+
+#     if clientes:
+#         clienteJSON = {
+#             "id": clientes[0],
+#             "nombre": clientes[1],
+#             "direccion": clientes[2],
+#             "telefono": clientes[3],
+#             "nit": clientes[4],
+#             "correo": clientes[5]
+#         }
+#         return clienteJSON
+#     else:
+#         return {"error": "Cliente no encontrado"}
     
 
-#************************
-# AGREGAR UN CLIENTE
-#************************
+# #************************
+# # AGREGAR UN CLIENTE
+# #************************
 
-@app.post("/clientes")
-def addClientes(nombre: str, direccion: str, telefono: str, nit: str, correo: str):
-    cursor.execute(f"INSERT INTO clientes (nombre, direccion, telefono, nit, correo) VALUES ('{nombre}', '{direccion}', '{telefono}', '{nit}', '{correo}')")
-    conexion.commit()
+# @app.post("/clientes")
+# def addClientes(nombre: str, direccion: str, telefono: str, nit: str, correo: str):
+#     cursor.execute(f"INSERT INTO clientes (nombre, direccion, telefono, nit, correo) VALUES ('{nombre}', '{direccion}', '{telefono}', '{nit}', '{correo}')")
+#     conexion.commit()
     
-    return {"Mensaje": "Cliente Agregado"}
+#     return {"Mensaje": "Cliente Agregado"}
 
 
-#************************
-# ACTUALIZAR TODOS LOS DATOS DE UN CLIENTE
-#************************
+# #************************
+# # ACTUALIZAR TODOS LOS DATOS DE UN CLIENTE
+# #************************
 
-@app.put("/clientes/{id}")
-def update_cliente(id: int, nombre: str, direccion: str, telefono: str, nit: str, correo: str):
-    cursor.execute(f"UPDATE clientes SET nombre='{nombre}', direccion='{direccion}', telefono='{telefono}', nit='{nit}', correo='{correo}' WHERE id={id}")
-    conexion.commit()
+# @app.put("/clientes/{id}")
+# def update_cliente(id: int, nombre: str, direccion: str, telefono: str, nit: str, correo: str):
+#     cursor.execute(f"UPDATE clientes SET nombre='{nombre}', direccion='{direccion}', telefono='{telefono}', nit='{nit}', correo='{correo}' WHERE id={id}")
+#     conexion.commit()
     
-    return {"Mensaje": "Cliente Actualizado"}
+#     return {"Mensaje": "Cliente Actualizado"}
 
-#************************
-# ACTUALIZAR PARCIALMENTE LOS DATOS DE UN CLIENTE
-#************************
 
-@app.patch("/clientes/{id}")
-def partial_update_cliente(id: int, nombre: str = None, direccion: str = None, telefono: str = None, nit: str = None, correo: str = None):
-    update_fields = []
-    if nombre:
-        update_fields.append(f"nombre='{nombre}'")
-    if direccion:
-        update_fields.append(f"direccion='{direccion}'")
-    if telefono:
-        update_fields.append(f"telefono='{telefono}'")
-    if nit:
-        update_fields.append(f"nit='{nit}'")
-    if correo:
-        update_fields.append(f"correo='{correo}'")
+# #************************
+# # ACTUALIZAR PARCIALMENTE LOS DATOS DE UN CLIENTE
+# #************************
 
-    if not update_fields:
-        return {"error": "Ningún campo proporcionado para actualizar"}
+# @app.patch("/clientes/{id}")
+# def partial_update_cliente(id: int, nombre: str = None, direccion: str = None, telefono: str = None, nit: str = None, correo: str = None):
+#     update_fields = []
+#     if nombre:
+#         update_fields.append(f"nombre='{nombre}'")
+#     if direccion:
+#         update_fields.append(f"direccion='{direccion}'")
+#     if telefono:
+#         update_fields.append(f"telefono='{telefono}'")
+#     if nit:
+#         update_fields.append(f"nit='{nit}'")
+#     if correo:
+#         update_fields.append(f"correo='{correo}'")
 
-    set_clause = ", ".join(update_fields)
-    cursor.execute(f"UPDATE clientes SET {set_clause} WHERE id={id}")
-    conexion.commit()
+#     if not update_fields:
+#         return {"error": "Ningún campo proporcionado para actualizar"}
+    
+#     set_clause = ", ".join(update_fields)
+#     cursor.execute(f"UPDATE clientes SET {set_clause} WHERE id={id}")
+#     conexion.commit()
 
-    return {"Mensaje": "Cliente Actualizado Parcialmente"}
+#     return {"Mensaje": "Cliente Actualizado"}
+    
 
-#************************
-# ELIMINAR UN CLIENTE
-#************************
+# #************************
+# # ELIMINAR UN CLIENTE
+# #************************
 
-@app.delete("/cliente/{id}")
-def deleteClientes(id: int):
-    clientes = cursor.execute(f"SELECT * FROM  clientes WHERE id={id}")
-    clientes = cursor.fetchone()
-    if clientes:
-        cursor.execute(f"DELETE FORM clientes WHERE id={id}")
-        conexion.commit()
-        return {"Mensaje": "Cliente eliminado"}
-    else:
-        raise HTTPException(status_code=404, detail="Cliente no encontrado")
+# @app.delete("/cliente/{id}")
+# def deleteClientes(id: int):
+#     clientes = cursor.execute(f"SELECT * FROM  clientes WHERE id={id}")
+#     clientes = cursor.fetchone()
+#     if clientes:
+#         cursor.execute(f"DELETE FORM clientes WHERE id={id}")
+#         conexion.commit()
+#         return {"Mensaje": "Cliente eliminado"}
+#     else:
+#         raise HTTPException(status_code=404, detail="Cliente no encontrado")
