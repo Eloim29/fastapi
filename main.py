@@ -2,7 +2,9 @@ from typing import Union
 from fastapi import FastAPI, HTTPException
 from config.database import cursor, conexion
 from fastapi.middleware.cors import CORSMiddleware
-from modulos.cotizacion import get_cotizaciones, cotizacion_por_id, add_cotizacion
+from modulos.cotizaciones import get_cotizaciones, cotizacion_por_id, add_cotizacion, partial_update_cotizacion, update_cotizaciones, delete_cotizacion
+from modulos.clientes import get_clientes
+from modulos.facturas import get_facturas
 
 origins = [
     
@@ -27,12 +29,34 @@ def cotizaciones():
     return get_cotizaciones()
 
 @app.get("/cotizaciones/{id}")
-def cotizaciones_id():
-    return cotizacion_por_id()
+def cotizaciones_id(id: int):
+    return cotizacion_por_id(id)
 
 @app.post("/cotizaciones")
-def agregar_cotizacion():
-    return add_cotizacion()
+def agregar_cotizacion(id_clientes: int, cantidad: str, descripcion: str, valor_unitario: str, subtotal: str, iva: str, descuento: str, total: str, orden_pedido: str):
+    return add_cotizacion(id_clientes, cantidad, descripcion,valor_unitario, subtotal, iva, descuento, total, orden_pedido )
+
+@app.put("/cotizaciones/{id}")
+def actualizar_cotizaciones(id: int, id_clientes: int, cantidad: str, descripcion: str, valor_unitario: str, subtotal: str, iva: str, descuento: str, total: str, orden_pedido: str):
+    return update_cotizaciones(id, id_clientes, cantidad, descripcion, valor_unitario, subtotal, iva, descuento, total, orden_pedido)
+
+@app.patch("/cotizaciones/{id}")
+def patch_cotizaciones(id: int, id_clientes: int, cantidad: str, descripcion: str, valor_unitario: str,
+                              subtotal: str, iva: str, descuento: str , total: str, orden_pedido: str):
+    return partial_update_cotizacion(id, id_clientes, cantidad, descripcion, valor_unitario, subtotal, iva, descuento, total, orden_pedido)
+
+@app.delete("/cotizacioines/{id}")
+def eliminar_cotizacion(id: int):
+    return delete_cotizacion(id)
+
+
+@app.get("/clientes")
+def clientes():
+    return get_clientes()
+
+
+
+
 
 # #************************
 # # OBTENER TODOS LOS CLIENTE

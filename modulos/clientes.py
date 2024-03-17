@@ -9,7 +9,7 @@ from typing import Union
 #************************
 
 
-def getClientes():
+def get_clientes():
     clientes = cursor.execute("SELECT * FROM clientes")
     clientes = cursor.fetchall()
 
